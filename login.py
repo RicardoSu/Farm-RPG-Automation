@@ -1,5 +1,6 @@
 import time
 import random
+import mysecrets
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,9 +12,6 @@ from selenium.webdriver.support.ui import Select
 browser = webdriver.Chrome()
 login = 'https://farmrpg.com/index.php#!/login.php'
 explore = 'https://farmrpg.com/index.php#!/explore.php'
-
-user = "ricardosu"
-pw = "Pokemon@1"
 
 
 def logTime():
@@ -27,9 +25,9 @@ def random_sleep(min_time, max_time):
 # Login to the game
 browser.get(login)
 random_sleep(1,2)
-browser.find_element(By.NAME, "username").send_keys(user)
+browser.find_element(By.NAME, "username").send_keys(mysecrets.username)
 random_sleep(0.1,0.3)
-browser.find_element(By.NAME, "password").send_keys(pw)
+browser.find_element(By.NAME, "password").send_keys(mysecrets.password)
 random_sleep(0.1,0.3)
 browser.find_element(By.CSS_SELECTOR, 'input#login_sub.button.btngreen').click()
 
@@ -37,83 +35,78 @@ home = "https://farmrpg.com/index.php#!/login.php"
 
 def grindFarm2():
     print(logTime() + ' : Accessing farm.')
-    farm = "https://farmrpg.com/index.php#!/xfarm.php?id=243308"
+    farm = f"https://farmrpg.com/index.php#!/xfarm.php?id={mysecrets.farm_id}"
     random_sleep(2,3)
     browser.get(farm)
     random_sleep(3,4)
     try:
         # Harvest ready crops + sanity check for farm loaded.
-        print(logTime() + ': Harvesting all ready crops.')
+        print(logTime() + ' : Harvesting all ready crops.')
         random_sleep(1,2)
         browser.find_element(By.CLASS_NAME, "harvestallbtn").click()
-        print(logTime() + ': Harvested all ready crops.')
+        print(logTime() + ' : Harvested all ready crops.')
         random_sleep(2,3)
 
         try:
-            print(logTime() + ': Clicking on 1st seed')
-            # random_sleep(1,2)
-            # browser.execute_script("document.querySelector('select.seedid').selectedIndex = 1;")
-            
+            print(logTime() + ' : Selecting the first available seed')
             random_sleep(1,2)
-
 
             # Locate the select element
             select_element = browser.find_element(By.CLASS_NAME, 'seedid')
             select_element.click()
             random_sleep(1,2)
+
             # Select the second option
+            # I could not select it manually so this is a fix
+            for i in range(random.randint(7, 10)):
+                select_element.send_keys(Keys.UP)
+                time.sleep(random.uniform(0.1, 0.3))
+                
             select_element.send_keys(Keys.DOWN)
-            random_sleep(0.5,0.75)
+            time.sleep(random.uniform(0.5, 0.75))
             select_element.send_keys(Keys.ENTER)
 
 
             # If we have seeds, plant new crops
-            print(logTime() + ': Do we have seeds?')
+            print(logTime() + ' : Do we have seeds?')
              
             seedsAmt = int(browser.find_element(By.CLASS_NAME,'seedid').find_elements(By.TAG_NAME, 'option')[1].get_attribute('data-amt'))
             seedsName = browser.find_element(By.CLASS_NAME,'seedid').find_elements(By.TAG_NAME, 'option')[1].get_attribute('data-name')
-            print(logTime() + ' Yes. We have ' + str(seedsAmt) + ' ' + seedsName + '.')
+            print(logTime() + ' : Yes. We have ' + str(seedsAmt) + ' ' + seedsName + '.')
 
             if seedsAmt > 0:
                 while True:
                     # Plant new crops
                     if seedsAmt > 0:
-                        print(logTime() + ': Planting new crops')
+                        print(logTime() + ' : Planting new crops')
                         browser.find_element(By.CLASS_NAME, "plantallbtn").click()
                         random_sleep(2,3)
                         browser.find_element(By.CLASS_NAME, "actions-modal-button").click()
                         random_sleep(1,2)
-                        print(logTime() + ': Waiting for crops to grow.')
+                        print(logTime() + ' : Waiting for crops to grow.')
                         random_sleep(120,150)
-                        print(logTime() + ': Restarting.')
+                        print(logTime() + ' : Restarting.')
                         grindFarm2()
+
         except Exception as e:
             print(f"Error: {e}")
             # If we don't have new seeds, go buy more.
             random_sleep(2,3)
-            print(logTime() + ': No more seeds remaining.')
-            # Sell all ready crops
-            random_sleep(1,2)
-            print(logTime() + ": Selling all the fully grown crops to ensure that we don't exceed the inventory limit.")
-            random_sleep(1,2)
-            browser.find_element(By.CLASS_NAME, "sellallcropsbtn").click()
-            print(logTime() + ': Selling all unlocked crops.')
-            random_sleep(1,2)
-            print(logTime()+': Confirm.')
-            browser.find_elements(By.CLASS_NAME, "actions-modal-button")[0].click()
-            random_sleep(1,2)
-            print(logTime()+': OK.')
-            random_sleep(3,4)
-            print(logTime() + ': Lets go to buy seeds Farmer!')
+            print(logTime() + ' : No more seeds remaining.')
+
+            # Sell all unlocked crops
+            sellUnlockedCrops()
+
+            print(logTime() + ' : Lets go to buy seeds Farmer!')
             buySeeds()
     except:
-        print(logTime() + ': Accessing farm failed. Trying again in 2 seconds.')
+        print(logTime() + ' : Accessing farm failed. Trying again in 2 seconds.')
         random_sleep(2,3)
         grindFarm2()
 
     try: 
-        print(logTime() + ': Accessing farm.')
-        farm = "https://farmrpg.com/index.php#!/xfarm.php?id=243308"
+        print(logTime() + ' : Accessing farm.')
+        farm = f"https://farmrpg.com/index.php#!/xfarm.php?id={mysecrets.farm_id}"
         browser.get(farm)
         random_sleep(3,4)
         try: 
@@ -121,34 +114,52 @@ def grindFarm2():
             if seedsAmt > 0:
                 while True: 
                     # Harvest ready crops 
-                    print(logTime() + ': Harvesting all ready crops.')
+                    print(logTime() + ' : Harvesting all ready crops.')
                     browser.find_element(By.CLASS_NAME, "harvestallbtn").click()
                     random_sleep(1,2) 
                     # Plant new crops 
                     if seedsAmt > 0: 
-                        print(logTime() + ': Planting new crops')
+                        print(logTime() + ' : Planting new crops')
                         browser.find_element(By.CLASS_NAME, "plantallbtn").click()
                         random_sleep(2,3)
                         browser.find_element(By.CLASS_NAME, "actions-modal-button").click()
                         random_sleep(1,2)
                         try:
                             seedsAmt = int(browser.find_element(By.CLASS_NAME,'seedid').find_elements(By.TAG_NAME, 'option')[1].get_attribute('data-amt'))
-                            print(logTime() + ': Seeds remaining: ' + str(seedsAmt))
-                            print(logTime() + ': Waiting for crops to finish.')
+                            print(logTime() + ' : Seeds remaining: ' + str(seedsAmt))
+                            print(logTime() + ' : Waiting for crops to finish.')
                             time.sleep(65)
                         except: 
                             print(logTime() + ' No seeds remaining. Buy more seeds.')
                             break
         except: 
-            print(logTime() + ': No seeds remaining. Buy more seeds.')
+            print(logTime() + ' : No seeds remaining. Buy more seeds.')
             buySeeds()
     except: 
-        print(logTime() + ': Accessing failed. Trying again in 2 seconds.')
+        print(logTime() + ' : Accessing failed. Trying again in 2 seconds.')
         random_sleep(2,3)
         grindFarm2()
 
+
+
+def sellUnlockedCrops():
+    random_sleep(1, 2)
+    print(logTime() + " : Selling all the fully grown crops to ensure that we don't exceed the inventory limit.")
+    random_sleep(1, 2)
+    browser.find_element(By.CLASS_NAME, "sellallcropsbtn").click()
+    print(logTime() + ' : Selling all unlocked crops.')
+    random_sleep(1, 2)
+    print(logTime()+' : Confirm.')
+    browser.find_elements(By.CLASS_NAME, "actions-modal-button")[0].click()
+    random_sleep(1, 2)
+    browser.find_elements(By.CLASS_NAME, "modal-button-bold")[0].click()
+    print(logTime()+' : OK.')
+    random_sleep(3, 4)
+
+
+
 def buySeeds():
-  print(logTime() + ': Going to the market to buy more needs.')
+  print(logTime() + ' : Going to the market to buy more needs.')
   market = "https://farmrpg.com/index.php#!/store.php" 
   try: 
     browser.get(market)
@@ -183,33 +194,34 @@ def buySeeds():
     # Refer to chart above
     seed_type = 9
 
-    print(logTime() + f": Selection '{seeds_dict[seed_type][0]}' Seeds.")
-    print(logTime()+': Selecting MAX for Seeds.')
+    print(logTime() + f" : Selection '{seeds_dict[seed_type][0]}' Seeds.")
+    print(logTime() + ' : Selecting MAX for Seeds.')
     m = browser.find_elements(By.CLASS_NAME, 'maxqty')[seed_type]
     browser.execute_script("arguments[0].click();", m) 
     random_sleep(1,2)
-    print(logTime() + f": Buying '{seeds_dict[seed_type][0]}' Seeds.")
+    print(logTime() + f" : Buying '{seeds_dict[seed_type][0]}' Seeds.")
     b = browser.find_elements(By.CLASS_NAME, 'buybtn')[seed_type]
     browser.execute_script("arguments[0].click();", b) 
     random_sleep(1,2)
-    print(logTime()+': Confirm.')
+    print(logTime()+':  Confirm.')
     browser.find_elements(By.CLASS_NAME, "actions-modal-button")[0].click()
     random_sleep(1,2)
-    print(logTime()+': OK.')
+    print(logTime()+' : OK.')
     browser.find_elements(By.CLASS_NAME, "modal-button")[2].click()
     random_sleep(1,2)
 
     return seeds_dict[seed_type][1]
   except: 
-      print(logTime()+': Market failed to load. Trying again in 2 seconds.')
+      print(logTime()+' : Market failed to load. Trying again in 2 seconds.')
       random_sleep(2,3)
       buySeeds()
-      print(logTime()+': Restart.') 
+      print(logTime()+' : Restart.') 
       grindFarm2()
 
-#Visit farm page, harvwest all crops, plant new crops 
+#Visit farm page, harvwest all crops, plant new crops
+
 def Farm_Check():
-    farm = "https://farmrpg.com/index.php#!/xfarm.php?id=243308"
+    farm = f"https://farmrpg.com/index.php#!/xfarm.php?id={mysecrets.farm_id}"
     browser.get(farm)
     time.sleep(1)
     try:
@@ -232,7 +244,7 @@ def Sell():
 def Explore():
     zoneSelect = str(random.randint(6, 8))
     explore4 = "https://farmrpg.com/index.php#!/area.php?id="+zoneSelect
-    print(logTime()+': Entering zone '+zoneSelect +'.')
+    print(logTime()+' : Entering zone '+zoneSelect +'.')
     browser.get(explore4)
     time.sleep(2)
     browser.get(explore4)
@@ -240,7 +252,7 @@ def Explore():
     counter = 0
     while True:
         try:
-            print(logTime() + ': Explore in zone. ' + zoneSelect + ' (' + str(counter) + '/50)')
+            print(logTime() + ' : Explore in zone. ' + zoneSelect + ' (' + str(counter) + '/50)')
             browser.find_element(By.ID, "exploreconsole").click()
             counter += 1
             time.sleep(1)
@@ -293,7 +305,7 @@ def eatLM():
 def Fishing():
     pondSelect = str(random.randint(1, 8))
     pond = "https://farmrpg.com/index.php#!/fishing.php?id=" + pondSelect
-    print(logTime() + ': Entering pond ' + pondSelect + '.')
+    print(logTime() + ' : Entering pond ' + pondSelect + '.')
     browser.get(pond)
     time.sleep(2)
     browser.get(pond)
@@ -304,19 +316,19 @@ def Fishing():
     except:
         Fishing()
     while worms > 0:
-        print(logTime() + ': Fishing in pond ' + pondSelect + ' (' + str(counter) + '/75)')
+        print(logTime() + ' : Fishing in pond ' + pondSelect + ' (' + str(counter) + '/75)')
         Catch()
         counter += 1
         worms = int(browser.find_element(By.CLASS_NAME, "col-45").find_element(By.TAG_NAME, 'strong').text)
         if counter > 75:
-            print(logTime() + ': Leaving pond ' + pondSelect + '.')
+            print(logTime() + ' : Leaving pond ' + pondSelect + '.')
             Fishing()
         if worms == 0:
             BuyWorms()
 
 def FishingHome():
     pond = "https://farmrpg.com/index.php#!/fishing.php?id=2"
-    print(logTime() + ': Entering pond ')
+    print(logTime() + ' : Entering pond ')
     browser.get(pond)
     time.sleep(2)
     browser.get(pond)
@@ -328,19 +340,19 @@ def FishingHome():
     except:
         FishingHome()
     while worms > 0:
-        print(logTime() + ': Fishing')
+        print(logTime() + ' : Fishing')
         Catch()
         counter += 1
         worms = int(browser.find_element(By.CLASS_NAME, "col-45").
         find_element(By.TAG_NAME, 'strong').text)
         if counter > 75:
-            print(logTime() + ': Refreshing pond.')
+            print(logTime() + ' : Refreshing pond.')
             FishingHome()
         if worms == 0:
             BuyWorms()
 
 def BuyWorms():
-  print(logTime() + ': Buying more worms.')
+  print(logTime() + ' : Buying more worms.')
   market = "https://farmrpg.com/index.php#!/store.php"
   browser.get(market)
   time.sleep(1)
@@ -387,4 +399,34 @@ def Crafting():
        break 
 
 
+def PetChicken():
+    random_sleep(1,2)
+    coop = f"https://farmrpg.com/index.php#!/coop.php?id={mysecrets.farm_id}"
+    browser.get(coop)
+    random_sleep(2,3)
 
+    coop = f"https://farmrpg.com/index.php#!/coop.php?id={mysecrets.farm_id}"
+    browser.get(coop)
+    random_sleep(2,3)
+
+    # Find all the img elements with the specified attributes
+    all_chickens = browser.find_elements(By.CSS_SELECTOR,'[data-id]')
+    # print(elements)
+    chickens_count = len(all_chickens)
+
+    print(logTime() + f' : You have {chickens_count-1} chicken(s) to pet.')
+
+    # Loop through each img element and click on it
+    counter = 0
+    for i in range(1,chickens_count):
+        random_sleep(1,2)
+        img_elements = browser.find_element(By.XPATH,f"//img[contains(@src, 'chicken.png') and @data-id='{i}']")
+        img_elements.click()
+        random_sleep(2,3)
+        counter += 1
+        browser.find_element(By.CLASS_NAME, "fa-heart").click()
+        print(logTime() + f' : You have pet {counter} chicken(s).')
+        random_sleep(1,2)
+        browser.find_elements(By.CLASS_NAME, "modal-button-bold")[0].click()
+        print(logTime()+' : OK.')
+        random_sleep(1, 2)
