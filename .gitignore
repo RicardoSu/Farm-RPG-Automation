@@ -1,1 +1,45 @@
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+*$py.class
 mysecrets.py
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Editors
+.idea/
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Compiled output
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Dependency directories
+venv/
+env/
+env.bak/
+
+# Compiled Python files
+*.pyc
+*.pyo
+
+# Package files
+*.egg-info/
+dist/
+build/
+

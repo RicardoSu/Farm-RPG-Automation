@@ -9,7 +9,7 @@ from WindowCapture import WindowCapture
 from selenium.webdriver.common.by import By
 
 
-class FishingStaminaBot:
+class FishingStaminaFarmBot:
     
     def __init__(self,browser):
         self.browser = browser

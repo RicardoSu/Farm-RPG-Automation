@@ -1,13 +1,11 @@
 import random
-import pyautogui
 import cv2 as cv
-from time import time 
-from time import sleep 
-from time import ctime
-from datetime import datetime
-from WindowCapture import WindowCapture
-from Vision import Vision
+import pyautogui
 from tkinter import *
+from Vision import Vision
+from datetime import datetime
+from time import sleep, time, ctime
+from WindowCapture import WindowCapture
 from selenium.webdriver.common.by import By
 
 
