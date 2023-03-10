@@ -103,7 +103,7 @@ class FishingStaminaBot:
             
 
     def Explore(self):
-        zoneSelect = str(random.randint(1, 5))
+        zoneSelect = str(random.randint(1, 7))
         explore_link = "https://farmrpg.com/index.php#!/area.php?id="+zoneSelect
         print(self.logTime()+' : Entering zone '+zoneSelect +'.')
 

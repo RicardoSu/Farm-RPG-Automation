@@ -8,13 +8,14 @@ from datetime import datetime
 from WindowCapture import WindowCapture
 from Vision import Vision
 from tkinter import *
+from selenium.webdriver.common.by import By
 
 
 class FishingBot:
     
-    def __init__(self):
+    def __init__(self,browser):
 
-        
+        self.browser = browser
         self.exitPlease = False
         # initialize the WindowCapture class
         self.wincap = WindowCapture()
@@ -44,15 +45,86 @@ class FishingBot:
     def logClickOnFish(self):
         print(self.logTime() + ' : Clicking on fish at LAKE TEMPEST')
 
-
     def exitApp(self):
         # If button pressed, destroy the window
         self.exitPlease = True
         
-    def main(self):  
+    def wormsCounter(self):
+        worms_value = self.browser.execute_script("""
+            const divElement = document.querySelector('.col-45 strong');
+            const numberValue = parseInt(divElement.textContent);
+            return numberValue;
+        """)
+        return int(worms_value)
+
+    def BuyWorms(self):
+        print(self.logTime() + ' : Buying more worms.')
+        market = "https://farmrpg.com/index.php#!/store.php"
+        self.browser.get(market)
+        self.random_sleep(2,3)
+        try: 
+            self.browser.find_elements(By.CLASS_NAME, "maxqty")[-1].click()
+        except:
+            self.browser.get(market)
+        self.random_sleep(0.5,1)
+        s = self.browser.find_elements(By.CLASS_NAME, 'buybtn')[-1]
+        self.browser.execute_script("arguments[0].click();", s)
+        self.random_sleep(0.5,1)
+        self.browser.find_element(By.CLASS_NAME, "actions-modal-button").click()
+        self.random_sleep(0.5,1)
+        self.browser.find_elements(By.CLASS_NAME, "modal-button")[2].click()
+        self.random_sleep(0.5,1)
+
+    def sellUnlockedFish(self):
+        self.random_sleep(1, 2)
+        print(self.logTime() + " : Selling all the unlocked fish to ensure that we don't exceed the inventory limit.")
+        self.random_sleep(1, 2)
+        self.browser.find_element(By.CLASS_NAME, "sellallfishbtn").click()
+        print(self.logTime() + ' : Selling all unlocked fish.')
+        self.random_sleep(1, 2)
+        print(self.logTime()+' : Confirm.')
+        self.browser.find_elements(By.CLASS_NAME, "actions-modal-button")[0].click()
+        self.random_sleep(1, 2)
+        self.browser.find_elements(By.CLASS_NAME, "modal-button-bold")[0].click()
+        print(self.logTime()+' : COMPLETED!.')
+        self.random_sleep(3, 4)
+
+
+    def PageNavigation(self,page_link):
+        self.browser.get(page_link)
+        self.random_sleep(2, 2.5)
+
+        self.browser.get(page_link)
+        self.random_sleep(2, 2.5)
+        
+
+    def main(self):
 
         resetTimer = time()
         while(self.exitPlease == False):
+            
+            
+            
+            if self.wormsCounter() <= 1:
+
+                print(self.logTime() + f" : You have {self.wormsCounter()} worm(s)")
+
+                self.random_sleep(1,2)
+
+                self.sellUnlockedFish()
+                self.random_sleep(3,4)
+
+                self.BuyWorms()
+                self.random_sleep(2,3)
+
+                fish_lake = f"https://farmrpg.com/#!/fishing.php?id=2"
+                self.browser.get(fish_lake)
+                self.random_sleep(2,3)
+
+                self.browser.get(fish_lake)
+                self.random_sleep(2, 2.5)
+
+                
             # get an updated image of the game
             screenshot = self.wincap.get_screenshot()
             if(self.STATE == 'FISHING'):
@@ -81,69 +153,18 @@ class FishingBot:
                     while(time() - tryingTimer < 2):
                         for clickTarget in findClickpoint:
                             # pyautogui.click(clickTarget[0], (clickTarget[1]))
-                            pyautogui.click(clickTarget[0], clickTarget[1] - 50)
+                            # Manual calibration clickTarget[1] - 55 
+                            pyautogui.click(clickTarget[0], clickTarget[1] - 55 )
                             self.STATE = 'FISHING'
 
                 if (time() - resetTimer > 15):
                     self.STATE = 'FISHING'
-                    print("reset")
+                    print(self.logTime() + " : RESET")
                         
 
 
-            # # refreshWindowTimer 
-            # if (time() - self.refreshWindowTimer > 1200): # EVERY 300 SECONDS REFRESH THE WINDOW, SELL ALL FISH, BUY BAIT
-            #     self.refreshWindowTimer = time()
-            #     sleep(3.5)
-            #     pyautogui.click(1010, 80)
-            #     print("Clicked at 1010, 80 on bookmark button")
-            #     sleep(3.5)
-            #     pyautogui.click(116, 180) # CLICK HOME
-            #     sleep(2)
-            #     pyautogui.click(400, 525) # CLICK GO TO TOWN [NORMAL 535, 430] [BANNER 400, 525]
-            #     sleep(2)
-            #     pyautogui.click(508, 318) # CLICK GO TO COUNTRY STORE
-            #     sleep(2)
-            #     scrollTimer = time()
-            #     while(time() - scrollTimer < 7):
-            #         pyautogui.scroll(-100) # SCROLL DOWN THE PAGE FOR 7 SECONDS
-            #         sleep(.1)
-            #     sleep(2)
-            #     pyautogui.click(1478, 820) # CLICK BUY WORMS
-            #     sleep(2)
-            #     pyautogui.click(960, 965) # CLICK YES
-            #     sleep(2)
-            #     checkForPopup = self.noRoomForBait.find(screenshot, 0.9, 'points')
-            #     if(checkForPopup.any()):
-            #         print("No room for bait")
-            #         pyautogui.click(966, 622) # CLICK OK
-            #         sleep(2)
-            #         pyautogui.click(116, 180) # CLICK HOME
-            #         sleep(2)
-            #         pyautogui.click(356, 592) # CLICK GO FISHING [NORMAL 502, 502] [BANNER 356, 592]
-            #         sleep(2)
-            #         pyautogui.click(573,533) # CLICK LAKE TEMPEST
-            #         print("Clicked at 502, 502 to go fishing at LAKE TEMPEST")
-            #         sleep(2)
-            #         # write to a new text file and log current time+"going fishing"
-            #         self.logFishing()
-            #         sleep(2)
-            #     else:
-            #         pyautogui.click(966, 564) # CLICK GO TO FARM
-            #         sleep(2)
-            #         pyautogui.click(116, 180) # CLICK HOME
-            #         sleep(2)
-            #         pyautogui.click(356, 592) # CLICK GO FISHING [NORMAL 502, 502] [BANNER 356, 592]
-            #         sleep(2)
-            #         pyautogui.click(573,533) # CLICK LAKE TEMPEST
-            #         print("Clicked at 502, 502 to go fishing at LAKE TEMPEST")
-            #         sleep(2)
-            #         # write to a new text file and log current time+"going fishing"
-            #         self.logFishing()
-            #         sleep(2)
-
-
             # debug the loop rate
-            print('FPS {}'.format(1 / (time() - self.loop_time)))
+            print(self.logTime() + ' : FPS {}'.format(1 / (time() - self.loop_time)))
             self.loop_time = time()
 
             # press 'q' with the output window focused to exit.

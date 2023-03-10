@@ -1,1 +1,1 @@
-cmd /k python -i login.py
+cmd /k python -i start.py

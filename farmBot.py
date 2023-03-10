@@ -80,7 +80,7 @@ class farmBot:
                           self.browser.find_element(By.CLASS_NAME, "actions-modal-button").click()
                           self.random_sleep(1,2)
                           print(self.logTime() + ' : Waiting for crops to grow.')
-                          self.random_sleep(120,150)
+                          self.random_sleep(120,240)
                           print(self.logTime() + ' : Restarting.')
                           self.grindFarm2()
 

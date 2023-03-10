@@ -28,7 +28,7 @@ SignIn = SignIn(browser)
 pettingCows = pettingCows(browser)
 pettingChickens = pettingChickens(browser)
 farmBot = farmBot(browser,mysecrets)
-FishingBot = FishingBot()
+FishingBot = FishingBot(browser)
 FishingStaminaBot = FishingStaminaBot(browser)
 
 #Logs in using credentials
