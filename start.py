@@ -6,13 +6,13 @@ import cv2 as cv
 import mysecrets
 from tkinter import *
 from SignIn import SignIn
-from farmBot import farmBot
+from FarmBot import FarmBot
 from datetime import datetime
 from selenium import webdriver
 from FishingBot import FishingBot
-from pettingCows import pettingCows
+from PettingCows import PettingCows
 from WindowCapture import WindowCapture
-from pettingChickens import pettingChickens
+from PettingChickens import PettingChickens
 from selenium.webdriver.common.by import By
 from FishingStaminaBot import FishingStaminaBot
 from selenium.webdriver.common.keys import Keys
@@ -23,28 +23,26 @@ browser = webdriver.Chrome()
 # set initial window size to 1280x720
 browser.set_window_size(1280, 720)
 
-
 SignIn = SignIn(browser)
-pettingCows = pettingCows(browser)
-pettingChickens = pettingChickens(browser)
-farmBot = farmBot(browser,mysecrets)
 FishingBot = FishingBot(browser)
+PettingCows = PettingCows(browser)
+FarmBot = FarmBot(browser,mysecrets)
+PettingChickens = PettingChickens(browser)
 FishingStaminaBot = FishingStaminaBot(browser)
 
 #Logs in using credentials
 SignIn.main()
 
-
 def runGrindFarm2():
-    farmBot.grindFarm2()
+    FarmBot.grindFarm2()
 
-def runpettingChickensBot():
-    pettingChickens.exitPlease = False
-    pettingChickens.main()
+def runPettingChickensBot():
+    PettingChickens.exitPlease = False
+    PettingChickens.main()
 
-def runpettingCowsBot():
-    pettingCows.exitPlease = False
-    pettingCows.main()
+def runPettingCowsBot():
+    PettingCows.exitPlease = False
+    PettingCows.main()
 
 def runFishingBot():
     FishingBot.exitPlease = False
@@ -92,9 +90,9 @@ root.attributes('-topmost',True)
 myLabel1 = Label(root, text="Farm Bot v2")
 myLabel2 = Button(root, command=runGrindFarm2, text="Farm!")
 myLabel3 = Label(root, text="Pet Chickens")
-myLabel4 = Button(root, command=runpettingChickensBot, text="Pet!")
+myLabel4 = Button(root, command=runPettingChickensBot, text="Pet!")
 myLabel5 = Label(root, text="Pet Cows")
-myLabel6 = Button(root, command=runpettingCowsBot, text="Pet!")
+myLabel6 = Button(root, command=runPettingCowsBot, text="Pet!")
 myLabel7 = Label(root, text="Start Fishing!")
 myLabel8 = Button(root, command=runFishingBot_background, text="Click Me!")
 myLabel9 = Button(root, command=stopFishingBot, text="Exit!")

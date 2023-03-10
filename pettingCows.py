@@ -6,7 +6,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-class pettingCows:
+class PettingCows:
     def __init__(self, browser):
         self.browser = browser
         self.exitPlease = False

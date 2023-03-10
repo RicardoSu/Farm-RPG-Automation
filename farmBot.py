@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
-class farmBot:
+class FarmBot:
 
   def __init__(self, browser, mysecrets):
       self.browser = browser
