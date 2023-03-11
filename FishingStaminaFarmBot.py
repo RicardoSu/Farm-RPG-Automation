@@ -1,12 +1,14 @@
 import random
 import cv2 as cv
 import pyautogui
+import mysecrets
 from tkinter import *
 from Vision import Vision
 from datetime import datetime
 from time import sleep, time, ctime
 from WindowCapture import WindowCapture
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 
 class FishingStaminaFarmBot:
@@ -116,26 +118,178 @@ class FishingStaminaFarmBot:
                 self.random_sleep(0.1, 0.2)
                 if self.staminaChecker() < 2:
                     print(self.logTime() + ' : Leaving zone ' + zoneSelect + '.')
-                    farm_pond = "https://farmrpg.com/#!/fishing.php?id=2"
-                    print(self.logTime()+' : Entering zone Farm Pond.')
-                    self.PageNavigation(farm_pond)
-                    self.main()
+                    self.grindFarm3()
+                    # farm_pond = "https://farmrpg.com/#!/fishing.php?id=2"
+                    # print(self.logTime()+' : Entering zone Farm Pond.')
+                    # self.PageNavigation(farm_pond)
+                    # self.main()
 
             except Exception as e:
                 print(self.logTime() + f" : An error occurred:", e)
-                farm_pond = "https://farmrpg.com/#!/fishing.php?id=2"
-                print(self.logTime()+' : Entering zone Farm Pond.')
-                self.PageNavigation(farm_pond)
-                self.main()
+                print(self.logTime() + ' : Leaving zone ' + zoneSelect + '.')
+                self.grindFarm3()
+                # farm_pond = "https://farmrpg.com/#!/fishing.php?id=2"
+                # print(self.logTime()+' : Entering zone Farm Pond.')
+                # self.PageNavigation(farm_pond)
+                # self.main()
+
+
+    def grindFarm3(self):
+
+        print(self.logTime() + ' : Accessing farm.')
+        farm = f"https://farmrpg.com/index.php#!/xfarm.php?id={mysecrets.farm_id}"
+        self.browser.get(farm)
+        self.random_sleep(2,3)
+        self.browser.refresh()
+        self.random_sleep(2,3)
+        try:
+            # Harvest ready crops + sanity check for farm loaded.
+            print(self.logTime() + ' : Harvesting all ready crops.')
+            self.random_sleep(1,2)
+            self.browser.find_element(By.CLASS_NAME, "harvestallbtn").click()
+            print(self.logTime() + ' : Harvested all ready crops.')
+            self.random_sleep(2,3)
+
+            try:
+                print(self.logTime() + ' : Selecting the first available seed')
+                self.random_sleep(1,2)
+
+                # Locate the select element
+                select_element = self.browser.find_element(By.CLASS_NAME, 'seedid')
+                select_element.click()
+                self.random_sleep(1,2)
+
+                # Select the second option
+                # I could not select it manually so this is a fix
+                for i in range(random.randint(7, 10)):
+                    select_element.send_keys(Keys.UP)
+                    self.random_sleep(0.1,0.3)
+                    
+                select_element.send_keys(Keys.DOWN)
+                self.random_sleep(0.5,0.75)
+                select_element.send_keys(Keys.ENTER)
+
+
+                # If we have seeds, plant new crops
+                print(self.logTime() + ' : Do we have seeds?')
+                
+                seedsAmt = int(self.browser.find_element(By.CLASS_NAME,'seedid').find_elements(By.TAG_NAME, 'option')[1].get_attribute('data-amt'))
+                seedsName = self.browser.find_element(By.CLASS_NAME,'seedid').find_elements(By.TAG_NAME, 'option')[1].get_attribute('data-name')
+                print(self.logTime() + ' : Yes. We have ' + str(seedsAmt) + ' ' + seedsName + '.')
+
+                if seedsAmt > 0:
+                    while True:
+                        # Plant new crops
+                        if seedsAmt > 0:
+                            print(self.logTime() + ' : Planting new crops')
+                            self.browser.find_element(By.CLASS_NAME, "plantallbtn").click()
+                            self.random_sleep(2,3)
+                            self.browser.find_element(By.CLASS_NAME, "actions-modal-button").click()
+                            self.random_sleep(1,2)
+                            print(self.logTime() + ' : Lets go Fish while we wait for crops to grow.')
+                            farm_pond = "https://farmrpg.com/#!/fishing.php?id=2"
+                            print(self.logTime()+' : Entering zone Farm Pond.')
+                            self.PageNavigation(farm_pond)
+                            self.main()
+
+            except Exception as e:
+                print(f"Error: {e}")
+                # If we don't have new seeds, go buy more.
+                self.random_sleep(2,3)
+                print(self.logTime() + ' : No more seeds remaining.')
+
+                # Sell all unlocked crops
+                self.sellUnlockedCrops()
+
+                print(self.logTime() + ' : Lets go to buy seeds Farmer!')
+                self.buySeeds()
+        except:
+            print(self.logTime() + ' : Accessing farm failed. Trying again in 2 seconds.')
+            self.random_sleep(2,3)
+            self.grindFarm3()
+
+    def buySeeds(self):
+        print(self.logTime() + ' : Going to the market to buy more needs.')
+        market = "https://farmrpg.com/index.php#!/store.php" 
+        try: 
+            self.browser.get(market)
+            self.random_sleep(2,3)
+
+            seeds_dict = {
+                0 : "Pepper",
+                1 : "Carrot",
+                2 : "Pea",
+                3 : "Cucumber",
+                4 : "Eggplant",
+                5 : "Radish",
+                6 : "Onion",
+                7 : "Hops",
+                8 : "Potato",
+                9 : "Tomato",
+                10 :"Leek",
+                11 :"Watermelon",
+                12 :"Corn",
+                13 :"Cabbage",
+                14 :"Pine",
+                15 :"Pumpkin",
+                16 :"Wheat",
+                17 :"Mushroom",
+                18 :"Broccoli",
+                19 :"Cotton",
+                20 :"Sunflower",
+                21 :"Beet",
+                22 :"Rice",
+            }
+
+            # Refer to chart above
+            seed_type = 9
+
+            print(self.logTime() + f" : Selection '{seeds_dict[seed_type][0]}' Seeds.")
+            print(self.logTime() + ' : Selecting MAX for Seeds.')
+            m = self.browser.find_elements(By.CLASS_NAME, 'maxqty')[seed_type]
+            self.browser.execute_script("arguments[0].click();", m) 
+            self.random_sleep(1,2)
+            print(self.logTime() + f" : Buying '{seeds_dict[seed_type][0]}' Seeds.")
+            b = self.browser.find_elements(By.CLASS_NAME, 'buybtn')[seed_type]
+            self.browser.execute_script("arguments[0].click();", b) 
+            self.random_sleep(1,2)
+            print(self.logTime()+':  Confirm.')
+            self.browser.find_elements(By.CLASS_NAME, "actions-modal-button")[0].click()
+            self.random_sleep(1,2)
+            print(self.logTime()+' : OK.')
+            self.browser.find_elements(By.CLASS_NAME, "modal-button")[2].click()
+            self.random_sleep(1,2)
+
+            return seeds_dict[seed_type][1]
+        except: 
+            print(self.logTime()+' : Market failed to load. Trying again in 2 seconds.')
+            self.random_sleep(1,2)
+            self.buySeeds()
+            print(self.logTime()+' : Restart.') 
+            self.grindFarm3()
+
+    def sellUnlockedCrops(self):
+        self.random_sleep(1, 2)
+        print(self.logTime() + " : Selling all the fully grown crops to ensure that we don't exceed the inventory limit.")
+        self.random_sleep(1, 2)
+        self.browser.find_element(By.CLASS_NAME, "sellallcropsbtn").click()
+        print(self.logTime() + ' : Selling all unlocked crops.')
+        self.random_sleep(1, 2)
+        print(self.logTime()+' : Confirm.')
+        self.browser.find_elements(By.CLASS_NAME, "actions-modal-button")[0].click()
+        self.random_sleep(1, 2)
+        self.browser.find_elements(By.CLASS_NAME, "modal-button-bold")[0].click()
+        print(self.logTime()+' : OK.')
+        self.random_sleep(1, 2)
 
     def exitApp(self):
         # If button pressed, destroy the window
         self.exitPlease = True
         
     def main(self):
+        print(self.logTime() + f" : Welcome to FishingStaminaFarmBot")
 
         counter = 0
-        farm_counter = 0
         resetTimer = time()
         while(self.exitPlease == False):
             
@@ -153,7 +307,7 @@ class FishingStaminaFarmBot:
                 self.random_sleep(2,3)
 
                 counter = 0
-                farm_counter += 1
+ 
             
             if self.wormsCounter() <= 1:
 
@@ -170,9 +324,8 @@ class FishingStaminaFarmBot:
                 fish_lake = f"https://farmrpg.com/#!/fishing.php?id=2"
                 self.browser.get(fish_lake)
                 self.random_sleep(2,3)
-
-                self.browser.get(fish_lake)
-                self.random_sleep(2, 2.5)
+                self.browser.refresh()
+                self.random_sleep(2,3)
 
                 
             # get an updated image of the game
@@ -184,7 +337,7 @@ class FishingStaminaFarmBot:
                     # Prints (x,y) of the found shadow
                     print(self.logTime() + f" : Fish Shadow Location : {findShadowClickpoint}")
                     self.logFishFound()
-                    sleep(.2)
+                    sleep(0.2)
                     for clickpoint in findShadowClickpoint:
                         pyautogui.click(clickpoint[0], clickpoint[1])
                         self.logClickOnFish()

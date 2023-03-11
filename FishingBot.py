@@ -27,7 +27,7 @@ class FishingBot:
 
     #Pause the program for a random amount of time between min_time and max_time seconds in miliseconds.
     def random_sleep(self,min_time, max_time):
-        time.sleep(random.uniform(min_time, max_time))
+        sleep(random.uniform(min_time, max_time))
 
     def logTime(self):
         return datetime.now().strftime("%H:%M:%S")

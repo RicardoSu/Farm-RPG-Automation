@@ -29,3 +29,10 @@ class SignIn:
         self.browser.find_element(By.NAME, "password").send_keys(mysecrets.password)
         self.random_sleep(0.1,0.3)
         self.browser.find_element(By.CSS_SELECTOR, 'input#login_sub.button.btngreen').click()
+
+    def farm_pond(self,id):
+        fish_zone = f"https://farmrpg.com/#!/fishing.php?id={id}"
+        self.browser.get(fish_zone)
+        self.random_sleep(1,2)
+        self.browser.refresh()
+        self.random_sleep(2,3)

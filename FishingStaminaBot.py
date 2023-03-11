@@ -99,7 +99,6 @@ class FishingStaminaBot:
         self.random_sleep(2, 2.5)
 
             
-
     def Explore(self):
         zoneSelect = str(random.randint(1, 7))
         explore_link = "https://farmrpg.com/index.php#!/area.php?id="+zoneSelect
