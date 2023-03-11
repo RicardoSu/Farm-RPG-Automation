@@ -31,6 +31,10 @@ To update your Farm RPG account information in the mysecrets.py file, follow the
    
 5. Run the script by running ` python -i Start.py` in the command line
 
+## Acknowledgements
+
+Special thanks to Swashed for his video tutorial on [YouTube](https://www.youtube.com/watch?v=LoC88j2QiA4) and LoganPederson for his [FarmRPG Bot](https://github.com/LoganPederson/FarmRPG_Bot) project which inspired this automation script.
+
 ## Disclaimer
 
 This project is for educational purposes only. Use of this script to gain an unfair advantage in the game Farm RPG is strictly prohibited. The author of this project is not responsible for any consequences that may arise from using this script.
